@@ -1,0 +1,25 @@
+{
+  "name": "oncall-agent",
+  "version": "1.0.0",
+  "description": "An AI agent that watches a Node.js API. When the API breaks, it reads the logs, finds the bug, fixes the code, restarts the API and checks it works again.\r Built for #neatHack (Oct 10–12, 2026).",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nainajais777/oncall-agent.git"
+  },
+  "keywords": [],
+  "author": "Naina Jaiswal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nainajais777/oncall-agent/issues"
+  },
+  "homepage": "https://github.com/nainajais777/oncall-agent#readme",
+  "dependencies": {
+    "@google/genai": "^2.28.0",
+    "dotenv": "^18.0.7"
+  }
+}
