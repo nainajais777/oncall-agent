@@ -18,6 +18,7 @@ export async function callModel(request, maxTries = 3) {
         console.log(`${model} attempt ${attempt} failed (${err.status}).`);
 const isClientError = err.status >= 400 && err.status < 500;
 if (isClientError && err.status !== 404 && err.status !== 429) throw err;  
+        if (attempt < maxTries) await sleep(2000 * attempt);
       }
     }
   }
