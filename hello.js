@@ -28,5 +28,5 @@ async function askWithRetry(question, maxTries = 3) {
 }
 
 // 2. CALL the function (outside, at the bottom) 
-const answer = await askWithRetry('My Node API returns 500. The log says: TypeError: Cannot read properties of undefined (reading "needMm") at server.js:61. What is the likely cause, in 2 lines?');
+const answer = await askWithRetry('What is the capital of France?');
 console.log(answer);
