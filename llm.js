@@ -1,7 +1,12 @@
 import 'dotenv/config';
+console.log('neatlogs key loaded:', process.env.NEATLOGS_API_KEY?.slice(0, 4) ?? 'MISSING');
 import { GoogleGenAI } from '@google/genai';
+import { init, wrapGoogleGenAI } from 'neatlogs';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+//await init({ apiKey: process.env.NEATLOGS_API_KEY, workflowName: 'oncall-agent' });
+//const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+await init({ apiKey: process.env.NEATLOGS_API_KEY, workflowName: 'oncall-agent', debug: true });
+const ai = wrapGoogleGenAI(new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }));
 const MODELS = ['gemini-3-flash-preview', 'gemini-2.5-flash', 'gemini-3.1-flash-lite'];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

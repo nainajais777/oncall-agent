@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Type } from '@google/genai';
 import { callModel } from './llm.js';
+import { span, flush, shutdown } from 'neatlogs';
 const SAFE_DIR = path.resolve('sample-api');
 function readFile({ path: filePath }) {
   const full = path.resolve(filePath);
@@ -40,7 +41,12 @@ const listFilesTool = {
 };
 
 // WHY: the loop gets a tool NAME from Gemini ("read_file") and must find the real function.
-const tools = { read_file: readFile, list_files: listFiles };
+//const tools = { read_file: readFile, list_files: listFiles };
+const tools = {
+  read_file: span({ kind: 'TOOL', toolName: 'read_file' }, readFile),
+  list_files: span({ kind: 'TOOL', toolName: 'list_files' }, listFiles),
+};
+const runAgent = span({ kind: 'WORKFLOW', name: 'incident_response' }, async () => {
 // ══════════════════════════════════════════════════════════════════
 
 // ═══ CHANGE 2: question WITHOUT file name + both tools ════════════
@@ -71,16 +77,21 @@ for (let step = 1; step <= MAX_STEPS; step++) {
   contents.push(response.candidates[0].content);
 
   // Same as before, but for ANY tool and ANY number of requests
-  const parts = calls.map((call) => {
+    const parts = [];
+  for (const call of calls) {
     console.log(`🔧 Step ${step}: ${call.name}`, call.args);
     const fn = tools[call.name];
-    const result = fn ? fn(call.args) : { error: `Unknown tool: ${call.name}` };
-    return { functionResponse: { name: call.name, id: call.id, response: result } };
-  });
-
+    const result = fn ? await fn(call.args) : { error: `Unknown tool: ${call.name}` };
+    parts.push({ functionResponse: { name: call.name, id: call.id, response: result } });
+  }
   // Same as before: send the results back
   contents.push({ role: 'user', parts });
 }
 if (!finished) {
-  console.log(`\n🙋 Gave up after ${MAX_STEPS} steps. Escalating to a human.`);
+  console.log(`\n Gave up after ${MAX_STEPS} steps. Escalating to a human.`);
 }
+});
+
+await runAgent();
+await flush();
+await shutdown();
